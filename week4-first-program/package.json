@@ -1,0 +1,15 @@
+{
+  "name": "week4-first-program-client",
+  "private": true,
+  "scripts": {
+    "interact": "tsx client/interact.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.3"
+  }
+}
