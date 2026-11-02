@@ -3,6 +3,7 @@
 
 pub mod error;
 pub mod instructions;
+pub mod math;
 pub mod state;
 
 use anchor_lang::prelude::*;
@@ -22,5 +23,9 @@ pub mod vault {
 
     pub fn create_user_account(ctx: Context<CreateUserAccount>) -> Result<()> {
         instructions::create_user_account::handle_create_user_account(ctx)
+    }
+
+    pub fn deposit(ctx: Context<Deposit>, amount: u64, min_shares_out: u64) -> Result<()> {
+        instructions::deposit::handle_deposit(ctx, amount, min_shares_out)
     }
 }

@@ -1,7 +1,7 @@
 import * as anchor from "@anchor-lang/core";
 import { Program } from "@anchor-lang/core";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { createMint } from "@solana/spl-token";
+import { createMint, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import { Vault } from "../target/types/vault";
 
 export const provider = anchor.AnchorProvider.env();
@@ -31,6 +31,47 @@ export async function fundedKeypair(sol = 2) {
 
 export const newMint = (decimals = 6) =>
   createMint(connection, payer, payer.publicKey, null, decimals);
+
+type VaultCtx = Awaited<ReturnType<typeof setupVault>>;
+
+/** Новый пользователь с токенами, токен-аккаунтом долей и PDA в vault. */
+export async function setupUser(ctx: VaultCtx, tokens: number) {
+  const user = await fundedKeypair();
+  const asset = await getOrCreateAssociatedTokenAccount(connection, payer, ctx.assetMint, user.publicKey);
+  const share = await getOrCreateAssociatedTokenAccount(connection, payer, ctx.shareMint, user.publicKey);
+  if (tokens > 0) await mintTo(connection, payer, ctx.assetMint, asset.address, payer, tokens);
+  await program.methods
+    .createUserAccount()
+    .accounts({ owner: user.publicKey, vault: ctx.vault })
+    .signers([user])
+    .rpc();
+  return { user, assetAccount: asset.address, shareAccount: share.address };
+}
+
+/** Депозит от имени пользователя. */
+export function depositIx(
+  ctx: VaultCtx,
+  u: Awaited<ReturnType<typeof setupUser>>,
+  amount: number,
+  minShares = 0
+) {
+  return program.methods
+    .deposit(new anchor.BN(amount), new anchor.BN(minShares))
+    .accountsPartial({
+      owner: u.user.publicKey,
+      vault: ctx.vault,
+      assetMint: ctx.assetMint,
+      shareMint: ctx.shareMint,
+      assetVault: ctx.assetVault,
+      userAssetAccount: u.assetAccount,
+      userShareAccount: u.shareAccount,
+    })
+    .signers([u.user]);
+}
+
+/** Код ошибки Anchor из исключения, иначе текст исключения. */
+export const errorCode = (err: unknown): string =>
+  (err as anchor.AnchorError).error?.errorCode?.code ?? String(err);
 
 /** Создаёт новый токен и vault для него. */
 export async function setupVault() {
