@@ -12,6 +12,14 @@ pub enum VaultError {
     InsufficientShares,
     #[msg("В хранилище недостаточно свободных токенов")]
     InsufficientIdleAssets,
+    #[msg("Действие доступно только управляющему vault")]
+    Unauthorized,
+    #[msg("Пул не подходит этому vault")]
+    InvalidPool,
+    #[msg("Токен-аккаунт не принадлежит этому vault")]
+    NotVaultAccount,
+    #[msg("Нужно указать минимальную сумму получения")]
+    MinimumOutRequired,
     #[msg("Переполнение при расчёте")]
     MathOverflow,
 }

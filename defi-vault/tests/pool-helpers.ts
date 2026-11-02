@@ -1,7 +1,8 @@
 import { BN } from "@anchor-lang/core";
 import { ComputeBudgetProgram, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
-import { connection, newMint, payer } from "./helpers";
+import { connection, newMint, payer, program, setupVault } from "./helpers";
+import { VaultPoolContext, quoteVaultPda } from "../scripts/lib/vault";
 import {
   createPoolIx,
   liquidityForAmounts,
@@ -17,6 +18,34 @@ export const sendWithBudget = (ixs: Parameters<Transaction["add"]>, signers: Par
     new Transaction().add(ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }), ...ixs),
     signers
   );
+
+/** Пул, vault на основном токене пула и подключение vault к пулу. */
+export async function setupVaultWithPool(assetIsToken0 = true) {
+  const poolCtx = await setupPool();
+  const { pool } = poolCtx;
+  const assetMint = assetIsToken0 ? pool.mint0 : pool.mint1;
+  const quoteMint = assetIsToken0 ? pool.mint1 : pool.mint0;
+  const vaultCtx = await setupVault(assetMint);
+  await program.methods
+    .configurePool()
+    .accountsPartial({
+      authority: payer.publicKey,
+      vault: vaultCtx.vault,
+      quoteMint,
+      poolState: pool.poolId,
+    })
+    .rpc();
+  const c: VaultPoolContext = {
+    program,
+    authority: payer.publicKey,
+    vault: vaultCtx.vault,
+    assetMint,
+    assetVault: vaultCtx.assetVault,
+    quoteVault: quoteVaultPda(program.programId, vaultCtx.vault),
+    pool,
+  };
+  return { ...poolCtx, vaultCtx, c, quoteMint };
+}
 
 /** Два новых токена, пул с ценой 1 и стартовая ликвидность в диапазоне [-1000, 1000]. */
 export async function setupPool(seed = 100_000_000_000) {

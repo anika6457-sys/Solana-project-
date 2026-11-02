@@ -4,6 +4,7 @@
 pub mod error;
 pub mod instructions;
 pub mod math;
+pub mod raydium;
 pub mod state;
 
 use anchor_lang::prelude::*;
@@ -31,5 +32,18 @@ pub mod vault {
 
     pub fn withdraw(ctx: Context<Withdraw>, shares: u64, min_amount_out: u64) -> Result<()> {
         instructions::withdraw::handle_withdraw(ctx, shares, min_amount_out)
+    }
+
+    pub fn configure_pool(ctx: Context<ConfigurePool>) -> Result<()> {
+        instructions::configure_pool::handle_configure_pool(ctx)
+    }
+
+    pub fn swap<'info>(
+        ctx: Context<'info, Swap<'info>>,
+        amount_in: u64,
+        minimum_amount_out: u64,
+        sqrt_price_limit_x64: u128,
+    ) -> Result<()> {
+        instructions::swap::handle_swap(ctx, amount_in, minimum_amount_out, sqrt_price_limit_x64)
     }
 }

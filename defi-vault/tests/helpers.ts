@@ -94,9 +94,9 @@ export function withdrawIx(
 export const errorCode = (err: unknown): string =>
   (err as anchor.AnchorError).error?.errorCode?.code ?? String(err);
 
-/** Создаёт новый токен и vault для него. */
-export async function setupVault() {
-  const assetMint = await newMint();
+/** Создаёт vault для токена (по умолчанию — для нового). */
+export async function setupVault(mint?: PublicKey) {
+  const assetMint = mint ?? (await newMint());
   const vault = vaultPda(assetMint);
   await program.methods
     .initializeVault()
