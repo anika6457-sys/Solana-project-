@@ -5,6 +5,7 @@ pub const SHARE_MINT_SEED: &[u8] = b"share";
 pub const ASSET_VAULT_SEED: &[u8] = b"asset_vault";
 pub const USER_SEED: &[u8] = b"user";
 pub const QUOTE_VAULT_SEED: &[u8] = b"quote_vault";
+pub const LP_SIGNER_SEED: &[u8] = b"lp_signer";
 
 /// Аккаунт настроек vault. PDA: ["vault", asset_mint].
 /// Он же — authority у share-токена и токен-аккаунтов vault.
@@ -23,9 +24,22 @@ pub struct VaultConfig {
     pub quote_mint: Pubkey,
     /// Токен-аккаунт vault для второго токена пула. PDA: ["quote_vault", vault].
     pub quote_vault: Pubkey,
+    /// NFT текущей позиции. Pubkey::default(), если позиции нет.
+    pub position_nft_mint: Pubkey,
+    pub position_tick_lower: i32,
+    pub position_tick_upper: i32,
 }
 
 impl VaultConfig {
+    pub fn has_position(&self) -> bool {
+        self.position_nft_mint != Pubkey::default()
+    }
+
+    /// Диапазон позиции включает нижнюю границу и не включает верхнюю.
+    pub fn is_tick_in_range(&self, tick: i32) -> bool {
+        tick >= self.position_tick_lower && tick < self.position_tick_upper
+    }
+
     /// Принадлежит ли токен-аккаунт самому vault.
     pub fn is_own_account(&self, key: &Pubkey) -> bool {
         *key == self.asset_vault || *key == self.quote_vault

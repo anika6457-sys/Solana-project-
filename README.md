@@ -36,3 +36,7 @@ npm run create-token     # 1000 SNZ выпущено, 250 переведено
 
 Для devnet: `solana config set --url devnet` и `RPC_URL=https://api.devnet.solana.com`
 для клиентских скриптов (нужно ~2–3 SOL на деплой программы).
+
+## Недели 8–13: DeFi-vault
+
+Сквозной проект — папка [`defi-vault`](defi-vault/README.md).

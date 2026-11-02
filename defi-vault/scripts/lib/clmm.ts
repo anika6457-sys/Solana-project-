@@ -7,6 +7,7 @@ import { TOKEN_2022_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/sp
 import {
   ClmmInstrument,
   LiquidityMathUtil,
+  PersonalPositionLayout,
   PoolInfoLayout,
   TickUtil,
   TickArrayUtil,
@@ -81,6 +82,17 @@ export async function readPool(connection: Connection, poolId: PublicKey) {
     tickSpacing: pool.tickSpacing as number,
     feeGrowth0: pool.feeGrowthGlobalX64A as BN,
     feeGrowth1: pool.feeGrowthGlobalX64B as BN,
+  };
+}
+
+export async function readPosition(connection: Connection, personalPosition: PublicKey) {
+  const info = await connection.getAccountInfo(personalPosition);
+  if (!info) throw new Error(`позиция ${personalPosition.toBase58()} не найдена`);
+  const position = PersonalPositionLayout.decode(info.data);
+  return {
+    liquidity: position.liquidity as BN,
+    tickLower: position.tickLower as number,
+    tickUpper: position.tickUpper as number,
   };
 }
 

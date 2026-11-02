@@ -20,6 +20,14 @@ pub enum VaultError {
     NotVaultAccount,
     #[msg("Нужно указать минимальную сумму получения")]
     MinimumOutRequired,
+    #[msg("Позиция уже открыта")]
+    PositionAlreadyOpen,
+    #[msg("Нет открытой позиции")]
+    NoOpenPosition,
+    #[msg("Цена внутри диапазона: переставлять позицию не нужно")]
+    PositionInRange,
+    #[msg("На аккаунте второго токена остались средства")]
+    QuoteNotEmpty,
     #[msg("Переполнение при расчёте")]
     MathOverflow,
 }

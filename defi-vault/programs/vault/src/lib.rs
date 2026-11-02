@@ -46,4 +46,37 @@ pub mod vault {
     ) -> Result<()> {
         instructions::swap::handle_swap(ctx, amount_in, minimum_amount_out, sqrt_price_limit_x64)
     }
+
+    pub fn open_position<'info>(
+        ctx: Context<'info, OpenPosition<'info>>,
+        params: OpenPositionParams,
+    ) -> Result<()> {
+        instructions::position::handle_open_position(ctx, params)
+    }
+
+    /// Выплачивает накопленные комиссии, не трогая ликвидность.
+    pub fn collect_fees<'info>(ctx: Context<'info, ModifyLiquidity<'info>>) -> Result<()> {
+        instructions::position::handle_decrease_liquidity(ctx, 0, 0, 0)
+    }
+
+    pub fn decrease_liquidity<'info>(
+        ctx: Context<'info, ModifyLiquidity<'info>>,
+        liquidity: u128,
+        amount_0_min: u64,
+        amount_1_min: u64,
+    ) -> Result<()> {
+        instructions::position::handle_decrease_liquidity(ctx, liquidity, amount_0_min, amount_1_min)
+    }
+
+    pub fn close_position(ctx: Context<ClosePosition>) -> Result<()> {
+        instructions::position::handle_close_position(ctx)
+    }
+
+    pub fn assert_out_of_range(ctx: Context<AssertOutOfRange>) -> Result<()> {
+        instructions::position::handle_assert_out_of_range(ctx)
+    }
+
+    pub fn sync_total_assets(ctx: Context<SyncTotalAssets>) -> Result<()> {
+        instructions::position::handle_sync_total_assets(ctx)
+    }
 }

@@ -8,6 +8,9 @@ skip-lint = false
 [programs.localnet]
 vault = "5CQXXi8aMKcmkWmZXHikKBvU5KUKfquWJtvt7R1K2KrN"
 
+[programs.devnet]
+vault = "5CQXXi8aMKcmkWmZXHikKBvU5KUKfquWJtvt7R1K2KrN"
+
 [provider]
 cluster = "localnet"
 wallet = "~/.config/solana/id.json"
