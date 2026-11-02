@@ -28,4 +28,8 @@ pub mod vault {
     pub fn deposit(ctx: Context<Deposit>, amount: u64, min_shares_out: u64) -> Result<()> {
         instructions::deposit::handle_deposit(ctx, amount, min_shares_out)
     }
+
+    pub fn withdraw(ctx: Context<Withdraw>, shares: u64, min_amount_out: u64) -> Result<()> {
+        instructions::withdraw::handle_withdraw(ctx, shares, min_amount_out)
+    }
 }

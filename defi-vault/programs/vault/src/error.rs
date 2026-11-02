@@ -8,6 +8,10 @@ pub enum VaultError {
     ZeroShares,
     #[msg("Получено меньше минимально допустимого")]
     SlippageExceeded,
+    #[msg("У пользователя меньше долей, чем он хочет сжечь")]
+    InsufficientShares,
+    #[msg("В хранилище недостаточно свободных токенов")]
+    InsufficientIdleAssets,
     #[msg("Переполнение при расчёте")]
     MathOverflow,
 }

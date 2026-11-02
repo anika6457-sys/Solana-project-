@@ -69,6 +69,27 @@ export function depositIx(
     .signers([u.user]);
 }
 
+/** Вывод от имени пользователя. */
+export function withdrawIx(
+  ctx: VaultCtx,
+  u: Awaited<ReturnType<typeof setupUser>>,
+  shares: number,
+  minAmount = 0
+) {
+  return program.methods
+    .withdraw(new anchor.BN(shares), new anchor.BN(minAmount))
+    .accountsPartial({
+      owner: u.user.publicKey,
+      vault: ctx.vault,
+      assetMint: ctx.assetMint,
+      shareMint: ctx.shareMint,
+      assetVault: ctx.assetVault,
+      userAssetAccount: u.assetAccount,
+      userShareAccount: u.shareAccount,
+    })
+    .signers([u.user]);
+}
+
 /** Код ошибки Anchor из исключения, иначе текст исключения. */
 export const errorCode = (err: unknown): string =>
   (err as anchor.AnchorError).error?.errorCode?.code ?? String(err);
